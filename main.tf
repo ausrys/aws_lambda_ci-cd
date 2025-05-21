@@ -1,5 +1,5 @@
 provider "aws" {
-  region     = "eu-northt-1"
+  region     = "eu-north-1"
   access_key = var.aws_access_key_id
   secret_key = var.aws_secret_access_key
 }
@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/handler.py"
+  source_file = "${path.module}/lambda_function/handler.py"
   output_path = "${path.module}/lambda.zip"
 }
 
