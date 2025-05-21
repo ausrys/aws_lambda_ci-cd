@@ -1,5 +1,6 @@
 import json
-from lambda.handler import lambda_handler
+from lambda_function.handler import lambda_handler
+
 
 def test_lambda_handler_success():
     event = {"body": json.dumps({"hello": "world"})}
