@@ -1,0 +1,48 @@
+name: CI/CD - Prod Branch
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Run unit tests
+        run: pytest tests
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Install zip utility
+        run: sudo apt-get install zip -y
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply Prod
+        id: tf
+        env:
+          TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          terraform apply -auto-approve
+          terraform output -raw lambda_function_url > lambda_url.txt
+
+      - name: Output Lambda URL
+        run: cat lambda_url.txt
