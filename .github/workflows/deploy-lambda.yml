@@ -1,0 +1,36 @@
+name: Deploy Lambda with Terraform
+
+on:
+  push:
+    branches:
+      - main # Change if you're using a different default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Set up Python (for Terraform zip archive)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install zip utility
+        run: sudo apt-get install zip -y
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Apply Terraform (auto-approve)
+        env:
+          TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform apply -auto-approve
